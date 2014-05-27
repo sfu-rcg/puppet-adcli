@@ -1,0 +1,6 @@
+name    'jumio-adcli'
+version '0.0.1'
+author  'Markus Burger'
+license 'Apache2'
+summary 'Puppet module for adcli'
+description 'This module installs and manages adcli. Check README for details.'
