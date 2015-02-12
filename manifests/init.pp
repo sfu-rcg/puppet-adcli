@@ -40,10 +40,20 @@ class adcli (
   $audit_only           = false,
   $noops                = undef,
   $join_domain          = false,
+
+  # required parameters
   $domain_name          = '',
-  $host_fqdn            = truncate($::hostname, 14),
+  $host_fqdn            = $::fqdn,
   $user_name            = '',
-  $user_password        = ''
+  $user_password        = '',
+ 
+  # optional parameters
+  $computer_name        = $::hostname,
+  $domain_ou            = undef,
+  $os_name              = undef,
+  $os_version           = undef,
+  $os_service_pack      = undef,
+  $service_names        = undef,
   ) inherits adcli::params {
 
   ###############################################
@@ -51,7 +61,6 @@ class adcli (
   ###############################################
 
   if $adcli::join_domain {
-
     if empty($adcli::domain_name) {
       fail("adcli::domain_name is required, but an empty string was given")
     }
@@ -91,7 +100,7 @@ class adcli (
   }
 
   #######################################
-  ### Resourced managed by the module ###
+  ### Resources managed by the module ###
   #######################################
 
   # Package
@@ -100,12 +109,52 @@ class adcli (
     noop    => $adcli::noops,
   }
 
+
+  #######################################
+  ### Assemble a giant exec statement ###
+  #######################################
+
+  # required parameters first
+  $exec_base = "/bin/bash -c '/bin/echo -n ${adcli::user_password} | /usr/sbin/adcli join ${adcli::domain_name} --host-fqdn=${adcli::host_fqdn} -U ${adcli::user_name}"
+
+  if $adcli::computer_name {
+    validate_string($adcli::computer_name)
+    $exec_cn = "--computer-name=${adcli::computer_name}"
+  }
+  if $domain_ou {
+    validate_string($domain_ou)
+    $exec_dou = "--domain-ou=\"${adcli::domain_ou}\""
+  }
+  if $os_name {
+    validate_string($os_name)
+    $exec_osn = "--os-name=\"${adcli::os_name}\""
+  }
+  if $os_version {
+    validate_string($os_version)
+    $exec_osv = "--os-version=\"${adcli::os_version}\""
+  }
+  if $os_service_pack {
+    validate_string($os_service_pack)
+    $exec_sp = "--os-version=\"${adcli::os_service_pack}\""
+  }
+  if $service_names {
+    validate_array($service_names)
+
+    # Guess who suggested inline templates to work around
+    # the lack of iteration in pre-Future Parser(tm) Puppet?
+    # Again? Riley. Thanks, Riley.
+    $exec_sns = inline_template("<% service_names.each do |service_name| %> --service-name=<%= service_name %><% end %>")
+  }
+
+  # N.B. you are not seeing things; we need that trailing single quote there
+  $adcli_exec = "${exec_base} ${exec_cn} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
+  
   # Join the Domain
   exec { "adcli_join_domain_${adcli::domain_name}":
-    command => "/bin/bash -c '/bin/echo -n ${adcli::user_password} | /usr/sbin/adcli join --host-fqdn=${adcli::host_fqdn} ${adcli::domain_name} -U ${adcli::user_name} --stdin-password'",
-    creates => '/etc/krb5.keytab',
-    require => Package[$adcli::package],
-    notify  => $adcli::manage_external_service
+     command => $adcli_exec,
+     creates => '/etc/krb5.keytab',
+     require => Package[$adcli::package],
+     notify  => $adcli::manage_external_service
   }
 
 

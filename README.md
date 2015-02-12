@@ -2,9 +2,14 @@
 
 This is a Puppet module for adcli.
 
-Based on a template defined in http://github.com/Example42-templates/
+Based on http://github.com/mburger/puppet-adcli (2014).
 
 Released under the terms of Apache 2 License.
+
+
+## changelog
+
+* 12-Feb-2014: Add extra parameters (domain_ou, os_name, os_version, os_service_pack, service_names); split up the assembly of the final exec statement
 
 
 ## USAGE - Basic management
@@ -70,7 +75,4 @@ Released under the terms of Apache 2 License.
         class { 'adcli':
           my_class => 'example42::my_adcli',
         }
-
-## TESTING
-[![Build Status](https://travis-ci.org/example42/puppet-adcli.png?branch=master)](https://travis-ci.org/example42/puppet-adcli)
 
