@@ -121,7 +121,7 @@ class adcli (
   if $adcli::computer_name {
     validate_string($adcli::computer_name)
     if $adcli::uppercase_hostname {
-        $exec_cn = inline_template("--computer-name=<%= hostname.upcase %>\$@AD.SFU.CA")
+        $exec_cn = inline_template("--computer-name=<%= hostname.upcase %>")
     } else {
         $exec_cn = "--computer-name=${adcli::computer_name}"
     }
