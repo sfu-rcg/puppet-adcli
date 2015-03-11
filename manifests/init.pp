@@ -54,6 +54,7 @@ class adcli (
   $os_version           = undef,
   $os_service_pack      = undef,
   $service_names        = undef,
+  $uppercase_hostname   = false,
   ) inherits adcli::params {
 
   ###############################################
@@ -119,7 +120,11 @@ class adcli (
 
   if $adcli::computer_name {
     validate_string($adcli::computer_name)
-    $exec_cn = "--computer-name=${adcli::computer_name}"
+    if $adcli::uppercase_hostname {
+        $exec_cn = inline_template("--computer-name=<%= hostname.upcase %>\$@AD.SFU.CA")
+    } else {
+        $exec_cn = "--computer-name=${adcli::computer_name}"
+    }
   }
   if $domain_ou {
     validate_string($domain_ou)
