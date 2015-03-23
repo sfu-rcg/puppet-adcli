@@ -32,6 +32,39 @@
 #   Basically you can run a dryrun for this specific module if you set
 #   this to true. Default: undef
 #
+# Optional class parameters
+#
+# [*computer_name*]
+#   The short hostname to use when creating a computer object for this host in
+#    Active Directory. Default: current shortname of this host.
+#
+# [*replication_wait*]
+#   Number of seconds to delay exiting this module. Performing operations on
+#   the newly-created computer object tend to fail it you don't wait at least
+#   90 seconds. Default: 90
+#
+# [*domain_ou*]
+#   Destination of the computer object that will be created upon joining.
+#   Default: undef, meaning AD will place it in YOURAD/Computers
+#
+# [*os_name*]
+#   Computer object comment field. Default: undef
+#
+# [*os_version*]
+#   Computer object comment field. Default: undef
+#
+# [*os_service_pack*]
+#   Computer object comment field. Default: undef
+#
+# [*service_names*]
+#   Kerberos service principals to add. Default: undef
+#
+# [*uppercase_hostname*]
+#   Whether we should present our hostname in uppercase when joining AD.
+#   Useful for maintaining consistency with clients that joined AD via Samba
+#   which insists on using uppercase hostnames. Default: false
+
+
 class adcli (
   $my_class             = '',
   $external_service     = '',
@@ -46,9 +79,10 @@ class adcli (
   $host_fqdn            = $::fqdn,
   $user_name            = '',
   $user_password        = '',
- 
+
   # optional parameters
   $computer_name        = $::hostname,
+  $replication_wait     = '90',
   $domain_ou            = undef,
   $os_name              = undef,
   $os_version           = undef,
@@ -152,8 +186,8 @@ class adcli (
   }
 
   # N.B. you are not seeing things; we need that trailing single quote there
-  $adcli_exec = "${exec_base} ${exec_cn} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
-  
+  $adcli_exec = "${exec_base} ${exec_cn} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}' ; /bin/sleep ${replication_wait}"
+
   # Join the Domain
   exec { "adcli_join_domain_${adcli::domain_name}":
      command => $adcli_exec,

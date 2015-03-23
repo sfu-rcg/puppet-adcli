@@ -9,7 +9,9 @@ Released under the terms of Apache 2 License.
 
 ## changelog
 
-* 12-Feb-2014: Add extra parameters (domain_ou, os_name, os_version, os_service_pack, service_names); split up the assembly of the final exec statement
+* 23-Mar-2015: Add replication_wait parameter to prevent module from exiting before newly-create computer objects have propagated across all domain controllers
+
+* 12-Feb-2015: Add extra parameters (domain_ou, os_name, os_version, os_service_pack, service_names); split up the assembly of the final exec statement
 
 
 ## USAGE - Basic management
@@ -50,10 +52,10 @@ Released under the terms of Apache 2 License.
 
 
 ## USAGE - Overrides and Customizations
-* Use custom sources for main config file 
+* Use custom sources for main config file
 
         class { 'adcli':
-          source => [ "puppet:///modules/example42/adcli/adcli.conf-${hostname}" , "puppet:///modules/example42/adcli/adcli.conf" ], 
+          source => [ "puppet:///modules/example42/adcli/adcli.conf-${hostname}" , "puppet:///modules/example42/adcli/adcli.conf" ],
         }
 
 
@@ -64,7 +66,7 @@ Released under the terms of Apache 2 License.
           source_dir_purge => false, # Set to true to purge any existing file not present in $source_dir
         }
 
-* Use custom template for main config file. Note that template and source arguments are alternative. 
+* Use custom template for main config file. Note that template and source arguments are alternative.
 
         class { 'adcli':
           template => 'example42/adcli/adcli.conf.erb',
@@ -75,4 +77,3 @@ Released under the terms of Apache 2 License.
         class { 'adcli':
           my_class => 'example42::my_adcli',
         }
-
