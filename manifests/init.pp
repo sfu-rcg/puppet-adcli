@@ -174,7 +174,7 @@ class adcli (
   }
   if $os_service_pack {
     validate_string($os_service_pack)
-    $exec_sp = "--os-version=\"${adcli::os_service_pack}\""
+    $exec_sp = "--os-service-pack=\"${adcli::os_service_pack}\""
   }
   if $service_names {
     validate_array($service_names)
