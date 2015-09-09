@@ -155,7 +155,7 @@ class adcli (
   if $adcli::computer_name {
     validate_string($adcli::computer_name)
     if $adcli::uppercase_hostname {
-        $exec_cn = inline_template("--computer-name=<%= hostname.upcase %>")
+        $exec_cn = inline_template("--computer-name=<%= @hostname.upcase %>")
     } else {
         $exec_cn = "--computer-name=${adcli::computer_name}"
     }
@@ -182,7 +182,7 @@ class adcli (
     # Guess who suggested inline templates to work around
     # the lack of iteration in pre-Future Parser(tm) Puppet?
     # Again? Riley. Thanks, Riley.
-    $exec_sns = inline_template("<% service_names.each do |service_name| %> --service-name=<%= service_name %><% end %>")
+    $exec_sns = inline_template("<% @service_names.each do |service_name| %> --service-name=<%= service_name %><% end %>")
   }
 
   # N.B. you are not seeing things; we need that trailing single quote there
