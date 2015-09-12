@@ -186,14 +186,18 @@ class adcli (
   }
 
   # N.B. you are not seeing things; we need that trailing single quote there
-  $adcli_exec = "${exec_base} ${exec_cn} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}' ; /bin/sleep ${replication_wait}"
+  $adcli_exec = "${exec_base} ${exec_cn} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
 
   # Join the Domain
   exec { "adcli_join_domain_${adcli::domain_name}":
-     command => $adcli_exec,
-     creates => '/etc/krb5.keytab',
-     require => Package[$adcli::package],
-     notify  => $adcli::manage_external_service
+    command => $adcli_exec,
+    creates => '/etc/krb5.keytab',
+    require => Package[$adcli::package],
+    notify  => $adcli::manage_external_service
+  } ->
+  exec { "adcli_join_domain_sleep_${adcli::domain_name}":
+    command => "/bin/sleep ${replication_wait}",
+    refreshonly => true
   }
 
 
