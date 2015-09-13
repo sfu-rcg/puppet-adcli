@@ -1,0 +1,14 @@
+{
+  "name": "jumio-adcli",
+  "version": "0.1.0",
+  "author": [ "Markus Burger", "dwarren", "asasfu" ],
+  "summary": "ADCLI module for puppet",
+  "description": "ADCLI module for puppet to join linux computers to AD",
+  "license": "Apache 2.0",
+  "source": "https://github.com/sfu-rcg/puppet-adcli.git",
+  "project_page": "",
+  "issues_url": "",
+  "dependencies": [
+  ]
+}
+
