@@ -9,7 +9,9 @@ Released under the terms of Apache 2 License.
 
 ## changelog
 
-* 23-Mar-2015: Add replication_wait parameter to prevent module from exiting before newly-create computer objects have propagated across all domain controllers
+* 18-Apr-2018: Port to Puppet 5.x and incorporate fixes from asa188
+
+* 23-Mar-2015: Add replication_wait parameter to prevent module from exiting before newly-created computer objects have propagated across all domain controllers
 
 * 12-Feb-2015: Add extra parameters (domain_ou, os_name, os_version, os_service_pack, service_names); split up the assembly of the final exec statement
 
