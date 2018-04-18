@@ -66,29 +66,29 @@
 
 
 class adcli (
-  $my_class             = '',
-  $external_service     = '',
-  $version              = 'present',
-  $absent               = false,
-  $audit_only           = false,
-  $noops                = undef,
-  $join_domain          = false,
+  String $my_class             = '',
+  String $external_service     = '',
+  String $version              = 'present',
+  Boolean $absent              = false,
+  Boolean $audit_only          = false,
+  Boolean $noops               = false,
+  Boolean $join_domain         = false,
 
   # required parameters
-  $domain_name          = '',
-  $host_fqdn            = $::fqdn,
-  $user_name            = '',
-  $user_password        = '',
+  String $domain_name          = '',
+  String $host_fqdn            = $::fqdn,
+  String $user_name            = '',
+  String $user_password        = '',
 
   # optional parameters
-  $computer_name        = $::hostname,
-  $replication_wait     = '90',
-  $domain_ou            = undef,
-  $os_name              = undef,
-  $os_version           = undef,
-  $os_service_pack      = undef,
-  $service_names        = undef,
-  $uppercase_hostname   = false,
+  String $computer_name        = $::hostname,
+  Integer $replication_wait    = 90,
+  String $domain_ou            = undef,
+  String $os_name              = undef,
+  String $os_version           = undef,
+  String $os_service_pack      = undef,
+  Array[String] $service_names = undef,
+  Boolean $uppercase_hostname  = false,
   ) inherits adcli::params {
 
   ###############################################
@@ -153,7 +153,6 @@ class adcli (
   $exec_base = "/bin/bash -c '/bin/echo -n ${adcli::user_password} | /usr/sbin/adcli join ${adcli::domain_name} --host-fqdn=${adcli::host_fqdn} -U ${adcli::user_name}"
 
   if $adcli::computer_name {
-    validate_string($adcli::computer_name)
     if $adcli::uppercase_hostname {
         $exec_cn = inline_template("--computer-name=<%= @hostname.upcase %>")
     } else {
@@ -161,24 +160,18 @@ class adcli (
     }
   }
   if $domain_ou {
-    validate_string($domain_ou)
     $exec_dou = "--domain-ou=\"${adcli::domain_ou}\""
   }
   if $os_name {
-    validate_string($os_name)
     $exec_osn = "--os-name=\"${adcli::os_name}\""
   }
   if $os_version {
-    validate_string($os_version)
     $exec_osv = "--os-version=\"${adcli::os_version}\""
   }
   if $os_service_pack {
-    validate_string($os_service_pack)
     $exec_sp = "--os-service-pack=\"${adcli::os_service_pack}\""
   }
   if $service_names {
-    validate_array($service_names)
-
     # Guess who suggested inline templates to work around
     # the lack of iteration in pre-Future Parser(tm) Puppet?
     # Again? Riley. Thanks, Riley.
@@ -193,18 +186,19 @@ class adcli (
     command => $adcli_exec,
     creates => '/etc/krb5.keytab',
     require => Package[$adcli::package],
-    notify  => $adcli::manage_external_service
-  } ->
+    notify  => [$adcli::manage_external_service]
+  } ~>
   exec { "adcli_join_domain_sleep_${adcli::domain_name}":
     command => "/bin/sleep ${replication_wait}",
     refreshonly => true
   }
 
 
+
   #######################################
   ### Optionally include custom class ###
   #######################################
-  if $adcli::my_class {
+  if !empty($adcli::my_class) {
     include $adcli::my_class
   }
 
