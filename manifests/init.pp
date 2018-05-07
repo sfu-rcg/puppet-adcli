@@ -83,7 +83,8 @@ class adcli (
   # optional parameters
   String $computer_name        = $::hostname,
   Integer $replication_wait    = 90,
-  String $domain_ou            = undef,
+  # RCG customization: disabled because we pre-create computer objects in AD
+  #String $domain_ou            = undef,
   String $os_name              = undef,
   String $os_version           = undef,
   String $os_service_pack      = undef,
@@ -159,9 +160,10 @@ class adcli (
         $exec_cn = "--computer-name=${adcli::computer_name}"
     }
   }
-  if $domain_ou {
-    $exec_dou = "--domain-ou=\"${adcli::domain_ou}\""
-  }
+  # RCG customization: disabled because we pre-create computer objects in AD
+  #if $domain_ou {
+  #   $exec_dou = "--domain-ou=\"${adcli::domain_ou}\""
+  #}
   if $os_name {
     $exec_osn = "--os-name=\"${adcli::os_name}\""
   }
@@ -179,20 +181,21 @@ class adcli (
   }
 
   # N.B. you are not seeing things; we need that trailing single quote there
-  $adcli_exec = "${exec_base} ${exec_cn} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
+  #$adcli_exec = "${exec_base} ${exec_cn} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
+  # RCG customization: remove ${exec_dou} because we pre-create computer objects in AD
+  $adcli_exec = "${exec_base} ${exec_cn} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
 
-  # Join the Domain
-  exec { "adcli_join_domain_${adcli::domain_name}":
-    command => $adcli_exec,
-    creates => '/etc/krb5.keytab',
-    require => Package[$adcli::package],
-    notify  => [$adcli::manage_external_service]
-  } ~>
-  exec { "adcli_join_domain_sleep_${adcli::domain_name}":
-    command => "/bin/sleep ${replication_wait}",
-    refreshonly => true
-  }
-
+    # Join the Domain
+    exec { "adcli_join_domain_${adcli::domain_name}":
+      command => $adcli_exec,
+      creates => '/etc/krb5.keytab',
+      require => Package[$adcli::package],
+      notify  => [$adcli::manage_external_service]
+    } ~>
+    exec { "adcli_join_domain_sleep_${adcli::domain_name}":
+      command => "/bin/sleep ${replication_wait}",
+      refreshonly => true
+    }
 
 
   #######################################
