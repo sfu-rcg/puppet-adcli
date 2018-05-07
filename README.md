@@ -9,6 +9,8 @@ Released under the terms of Apache 2 License.
 
 ## changelog
 
+* 07-May-2018: puppet5-port-rcgcustom: comment out domain_ou parameter since we precreate machine objects. Don't ask me why we didn't have to do this under Puppet 3.x.
+
 * 18-Apr-2018: Port to Puppet 5.x and incorporate fixes from asa188
 
 * 23-Mar-2015: Add replication_wait parameter to prevent module from exiting before newly-created computer objects have propagated across all domain controllers
