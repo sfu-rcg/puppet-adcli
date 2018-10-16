@@ -150,7 +150,7 @@ class adcli (
   #######################################
 
   # required parameters first
-  $exec_base = "/bin/bash -c '/bin/echo -n ${adcli::user_password} | /usr/sbin/adcli join ${adcli::domain_name} --host-fqdn=${adcli::host_fqdn} -U ${adcli::user_name}"
+  $exec_base = "/bin/bash -c '/bin/echo -n ${adcli::user_password} | /usr/sbin/adcli join ${adcli::domain_name} --host-fqdn=${adcli::host_fqdn} -U \"${adcli::user_name}\""
 
   if $adcli::computer_name {
     validate_string($adcli::computer_name)
